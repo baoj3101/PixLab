@@ -51,7 +51,7 @@ public class PictureTester {
      */
     public static void testEdgeDetection() {
         Picture swan = new Picture("swan.jpg");
-        swan.edgeDetection(10);
+        swan.edgeDetection(10);   // threshold can be adjusted to control noise
         swan.explore();
     }
 

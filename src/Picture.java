@@ -122,7 +122,7 @@ public class Picture extends SimplePicture {
             for (int j = 0; j < pixels[i].length; j++) {
                 pixels[i][j].setRed(255 - pixels[i][j].getRed());
                 pixels[i][j].setGreen(255 - pixels[i][j].getGreen());
-                pixels[i][j].setRed(255 - pixels[i][j].getBlue());
+                pixels[i][j].setBlue(255 - pixels[i][j].getBlue());
             }
         }
     }
@@ -147,7 +147,8 @@ public class Picture extends SimplePicture {
      */
     public void fixUnderwater() {
         Pixel[][] pixels = this.getPixels2D();
-
+        
+        // Calcuate average of blue value of all pixels
         int averageBlueValue = 0;
         for (int i = 0; i < pixels.length; i++) {
             for (int j = 0; j < pixels[i].length; j++) {
@@ -156,12 +157,13 @@ public class Picture extends SimplePicture {
         }
         averageBlueValue = Math.floorDiv(averageBlueValue, pixels.length * pixels[0].length);
 
+        // if any pixel blue is > average blue + 15, reduce blue and make it yellowish
         for (int i = 0; i < pixels.length; i++) {
             for (int j = 0; j < pixels[i].length; j++) {
                 if (pixels[i][j].getBlue() > averageBlueValue + 15) {
                     pixels[i][j].setGreen(pixels[i][j].getBlue());
                     pixels[i][j].setRed(pixels[i][j].getBlue());
-                    pixels[i][j].setBlue(averageBlueValue - 100);
+                    pixels[i][j].setBlue(averageBlueValue - 100);   // reduce blue value
                 }
             }
         }
@@ -414,36 +416,37 @@ public class Picture extends SimplePicture {
                 Pixel top = pixels[row][col];
                 Pixel bot = pixels[row + 1][col];
                 if(bot.colorDistance(top.getColor()) > edgeDist)
-                    top.setColor(Color.black);
+                    top.setColor(Color.BLACK);
                 else
-                    top.setColor(Color.white);
+                    top.setColor(Color.WHITE);
             }
         }
     }
 
     /**
-     * blurs an image within a specified rectangle
+     * blurs an image within a specified rectangle by taking average of 3x3 pixels
+     * around the current pixel
      * @param x, y: the upper-left points of origin
      *        w, h: the width and height dimensions of the rectangle
      */
     public void blur (int x, int y, int w, int h) 
     {
         Pixel[][] Pixels = this.getPixels2D();
-        for (int i = x; i < x + w; i++) {
-            for (int j = y; j < y + h; j++) {
+        for (int row = x; row < x + h; row++) {
+            for (int col = y; col < y + w; col++) {
                 // sum of red/blue/green of 3x3 surrounding pixels
                 int red = 0, blue = 0, green = 0;
                 for (int ni = -1; ni <= 1; ni++) {
-                    for (int nj = -1; nj <=1; nj++) {
-                        red   += Pixels[i+ni][j+nj].getRed();
-                        blue  += Pixels[i+ni][j+nj].getBlue();
-                        green += Pixels[i+ni][j+nj].getGreen();
+                    for (int nj = -1; nj <= 1; nj++) {
+                        red   += Pixels[row+ni][col+nj].getRed();
+                        blue  += Pixels[row+ni][col+nj].getBlue();
+                        green += Pixels[row+ni][col+nj].getGreen();
                     }
                 }
                 // color average for 3x3 and set color
-                Pixels[i][j].setRed(red/9);
-                Pixels[i][j].setBlue(blue/9);
-                Pixels[i][j].setGreen(green/9);
+                Pixels[row][col].setRed(red/9);
+                Pixels[row][col].setBlue(blue/9);
+                Pixels[row][col].setGreen(green/9);
             }
         }
     }
